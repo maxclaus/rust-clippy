@@ -1,0 +1,77 @@
+error: possible broken doc link: broken across multiple lines
+  --> tests/ui/doc_broken_link.rs:41:5
+   |
+LL |   /// [doc invalid link broken url scheme part part](https://
+   |  _____^
+LL | | /// test.fake/doc_invalid_link_broken_url_scheme_part)
+   | |______________________________________________________^
+   |
+   = note: `-D clippy::doc-broken-link` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::doc_broken_link)]`
+
+error: possible broken doc link: broken across multiple lines
+  --> tests/ui/doc_broken_link.rs:41:5
+   |
+LL |   /// [doc invalid link broken url scheme part part](https://
+   |  _____^
+LL | | /// test.fake/doc_invalid_link_broken_url_scheme_part)
+   | |______________________________________________________^
+   |
+   = note: duplicate diagnostic emitted due to `-Z deduplicate-diagnostics=no`
+
+error: possible broken doc link: broken across multiple lines
+  --> tests/ui/doc_broken_link.rs:47:5
+   |
+LL |   /// [doc invalid link broken url host part](https://test
+   |  _____^
+LL | | /// .fake/doc_invalid_link_broken_url_host_part)
+   | |________________________________________________^
+
+error: possible broken doc link: broken across multiple lines
+  --> tests/ui/doc_broken_link.rs:47:5
+   |
+LL |   /// [doc invalid link broken url host part](https://test
+   |  _____^
+LL | | /// .fake/doc_invalid_link_broken_url_host_part)
+   | |________________________________________________^
+   |
+   = note: duplicate diagnostic emitted due to `-Z deduplicate-diagnostics=no`
+
+error: possible broken doc link: broken across multiple lines
+  --> tests/ui/doc_broken_link.rs:53:16
+   |
+LL |   /// There is a [fist link - invalid](https://test
+   |  ________________^
+LL | | /// .fake) then it continues
+   | |__________^
+
+error: possible broken doc link: broken across multiple lines
+  --> tests/ui/doc_broken_link.rs:56:80
+   |
+LL |   /// with a [second link - valid](https://test.fake/doc_valid_link) and another [third link - invalid](https://test
+   |  ________________________________________________________________________________^
+LL | | /// .fake). It ends with another
+   | |__________^
+
+error: possible broken doc link: broken across multiple lines
+  --> tests/ui/doc_broken_link.rs:53:16
+   |
+LL |   /// There is a [fist link - invalid](https://test
+   |  ________________^
+LL | | /// .fake) then it continues
+   | |__________^
+   |
+   = note: duplicate diagnostic emitted due to `-Z deduplicate-diagnostics=no`
+
+error: possible broken doc link: broken across multiple lines
+  --> tests/ui/doc_broken_link.rs:56:80
+   |
+LL |   /// with a [second link - valid](https://test.fake/doc_valid_link) and another [third link - invalid](https://test
+   |  ________________________________________________________________________________^
+LL | | /// .fake). It ends with another
+   | |__________^
+   |
+   = note: duplicate diagnostic emitted due to `-Z deduplicate-diagnostics=no`
+
+error: aborting due to 8 previous errors
+
