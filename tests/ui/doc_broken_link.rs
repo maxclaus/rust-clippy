@@ -4,6 +4,18 @@ fn main() {}
 
 pub struct FakeType {}
 
+/// This might be considered a link false positive
+/// and should be ignored by this lint rule:
+/// Example of referencing some code with brackets [FakeType].
+pub fn doc_ignore_link_false_positive_1() {}
+
+/// This might be considered a link false positive
+/// and should be ignored by this lint rule:
+/// [`FakeType`]. Continue text after brackets,
+/// then (something in
+/// parenthesis).
+pub fn doc_ignore_link_false_positive_2() {}
+
 /// Test valid link, whole link single line.
 /// [doc valid link](https://test.fake/doc_valid_link)
 pub fn doc_valid_link() {}
@@ -58,15 +70,3 @@ pub fn doc_invalid_link_broken_url_host_part() {}
 //~^^ ERROR: possible broken doc link: broken across multiple lines
 /// line of comment.
 pub fn doc_multiple_invalid_link_broken_url() {}
-
-/// This might be considered a link false positive
-/// and should be ignored by this lint rule:
-/// Example of referencing some code with brackets [FakeType].
-pub fn doc_ignore_link_false_positive_1() {}
-
-/// This might be considered a link false positive
-/// and should be ignored by this lint rule:
-/// [`FakeType`]. Continue text after brackets,
-/// then (something in
-/// parenthesis).
-pub fn doc_ignore_link_false_positive_2() {}

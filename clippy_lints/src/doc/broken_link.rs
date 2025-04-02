@@ -23,79 +23,53 @@ enum BrokenLinkReason {
     MultipleLines,
 }
 
-#[derive(Debug)]
-enum State {
-    ProcessingLinkText,
-    ProcessedLinkText,
-    ProcessingLinkUrl(UrlState),
-}
-
-#[derive(Debug)]
-enum UrlState {
-    Empty,
-    FilledEntireSingleLine,
-    FilledBrokenMultipleLines,
-}
-
 fn warn_if_broken_link(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &String, fragments: &Vec<DocFragment>) {
     if let Some(span) = source_span_for_markdown_range(cx.tcx, doc, &bl.span, fragments) {
-        // `PullDownBrokenLink` provided by pulldown_cmark always
-        // start with `[` which makes pulldown_cmark consider this a link tag.
-        let mut state = State::ProcessingLinkText;
+        let mut len = 0;
 
-        // Whether it was detected a line break within the link tag url part.
-        let mut reading_link_url_new_line = false;
+        // grab raw link data
+        let (_, raw_link) = doc.split_at(bl.span.start);
 
-        // Skip the first char because we already know it is a `[` char.
-        for (abs_pos, c) in doc.char_indices().skip(bl.span.start + 1) {
-            match &state {
-                State::ProcessingLinkText => {
-                    if c == ']' {
-                        state = State::ProcessedLinkText;
-                    }
-                },
-                State::ProcessedLinkText => {
-                    if c == '(' {
-                        state = State::ProcessingLinkUrl(UrlState::Empty);
-                    } else {
-                        // not a real link, just skip it without reporting a broken link for it.
-                        break;
-                    }
-                },
-                State::ProcessingLinkUrl(url_state) => {
-                    if c == '\n' {
-                        reading_link_url_new_line = true;
-                        continue;
-                    }
+        // strip off link text part
+        let raw_link = match raw_link.split_once(']') {
+            None => return,
+            Some((prefix, suffix)) => {
+                len += prefix.len() + 1;
+                suffix
+            },
+        };
 
-                    if c == ')' {
-                        // record full broken link tag
-                        if let UrlState::FilledBrokenMultipleLines = url_state {
-                            let offset = abs_pos - bl.span.start;
-                            report_broken_link(cx, span, offset, BrokenLinkReason::MultipleLines);
-                        }
-                        break;
-                    }
+        let raw_link = match raw_link.split_once('(') {
+            None => return,
+            Some((prefix, suffix)) => {
+                if !prefix.is_empty() {
+                    // there is text between ']' and '(' chars, so it is not a valid link
+                    return;
+                }
+                len += prefix.len() + 1;
+                suffix
+            },
+        };
 
-                    if !c.is_whitespace() {
-                        if reading_link_url_new_line {
-                            // It was reading a link url which was entirely in a single line, but a new char
-                            // was found in this new line which turned the url into a broken state.
-                            state = State::ProcessingLinkUrl(UrlState::FilledBrokenMultipleLines);
-                            continue;
-                        }
+        for c in raw_link.chars() {
+            if c == ')' {
+                // it is a valid link
+                return;
+            }
 
-                        state = State::ProcessingLinkUrl(UrlState::FilledEntireSingleLine);
-                    }
-                },
-            };
+            if c == '\n' {
+                // detected break line within the url part
+                report_broken_link(cx, span, len, BrokenLinkReason::MultipleLines);
+                break;
+            }
+            len += 1;
         }
     }
 }
 
 fn report_broken_link(cx: &LateContext<'_>, frag_span: Span, offset: usize, reason: BrokenLinkReason) {
     let start = frag_span.lo();
-    let end = start + BytePos::from_usize(offset + 5);
+    let end = start + BytePos::from_usize(offset);
 
     let span = Span::new(start, end, frag_span.ctxt(), frag_span.parent());
 
