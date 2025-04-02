@@ -781,6 +781,14 @@ struct DocHeaders {
 /// back in the various late lint pass methods if they need the final doc headers, like "Safety" or
 /// "Panics" sections.
 fn check_attrs(cx: &LateContext<'_>, valid_idents: &FxHashSet<String>, attrs: &[Attribute]) -> Option<DocHeaders> {
+    // We don't want the parser to choke on intra doc links. Since we don't
+    // actually care about rendering them, just pretend that all broken links
+    // point to a fake address.
+    #[expect(clippy::unnecessary_wraps)] // we're following a type signature
+    fn fake_broken_link_callback<'a>(_: BrokenLink<'_>) -> Option<(CowStr<'a>, CowStr<'a>)> {
+        Some(("fake".into(), "fake".into()))
+    }
+
     if suspicious_doc_comments::check(cx, attrs) || is_doc_hidden(attrs) {
         return None;
     }
@@ -815,30 +823,12 @@ fn check_attrs(cx: &LateContext<'_>, valid_idents: &FxHashSet<String>, attrs: &[
         return Some(DocHeaders::default());
     }
 
-    // We don't want the parser to choke on intra doc links. Since we don't
-    // actually care about rendering them, just pretend that all broken links
-    // point to a fake address.
-    // NOTE: use this full cb version only for the check_doc function.
-    // Otherwise, using it as callback for more functions will cause,
-    // duplicated diagnostics for the broken link checker.
-    // Use the light cb version for the other cases.
-    #[expect(clippy::unnecessary_wraps)] // we're following a type signature
-    let mut full_fake_broken_link_callback = |bl: BrokenLink<'_>| -> Option<(CowStr<'_>, CowStr<'_>)> {
-        broken_link::check(cx, &bl, &doc, &fragments);
-        Some(("fake".into(), "fake".into()))
-    };
-
-    #[expect(clippy::unnecessary_wraps)] // we're following a type signature
-    fn light_fake_broken_link_callback<'a>(_: BrokenLink<'_>) -> Option<(CowStr<'a>, CowStr<'a>)> {
-        Some(("fake".into(), "fake".into()))
-    }
-
     check_for_code_clusters(
         cx,
         pulldown_cmark::Parser::new_with_broken_link_callback(
             &doc,
             main_body_opts() - Options::ENABLE_SMART_PUNCTUATION,
-            Some(&mut light_fake_broken_link_callback),
+            Some(&mut fake_broken_link_callback),
         )
         .into_offset_iter(),
         &doc,
@@ -847,6 +837,13 @@ fn check_attrs(cx: &LateContext<'_>, valid_idents: &FxHashSet<String>, attrs: &[
             fragments: &fragments,
         },
     );
+
+    // NOTE: check_doc uses it own cb function,
+    // to avoid causing duplicated diagnostics for the broken link checker.
+    let mut full_fake_broken_link_callback = |bl: BrokenLink<'_>| -> Option<(CowStr<'_>, CowStr<'_>)> {
+        broken_link::check(cx, &bl, &doc, &fragments);
+        Some(("fake".into(), "fake".into()))
+    };
 
     // disable smart punctuation to pick up ['link'] more easily
     let opts = main_body_opts() - Options::ENABLE_SMART_PUNCTUATION;

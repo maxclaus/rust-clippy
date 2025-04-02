@@ -7,18 +7,18 @@ use rustc_span::{BytePos, Pos, Span};
 use super::DOC_BROKEN_LINK;
 
 /// Scan and report broken link on documents.
-/// It ignores false positives detected by pulldown_cmark, and only
+/// It ignores false positives detected by `pulldown_cmark`, and only
 /// warns users when the broken link is consider a URL.
 // NOTE: We don't check these other cases because
 // rustdoc itself will check and warn about it:
 // - When a link url is broken across multiple lines in the URL path part
 // - When a link tag is missing the close parenthesis character at the end.
 // - When a link has whitespace within the url link.
-pub fn check(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &String, fragments: &Vec<DocFragment>) {
+pub fn check(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &str, fragments: &[DocFragment]) {
     warn_if_broken_link(cx, bl, doc, fragments);
 }
 
-fn warn_if_broken_link(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &String, fragments: &Vec<DocFragment>) {
+fn warn_if_broken_link(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &str, fragments: &[DocFragment]) {
     if let Some(span) = source_span_for_markdown_range(cx.tcx, doc, &bl.span, fragments) {
         let mut len = 0;
 
