@@ -25,7 +25,7 @@ pub fn doc_valid_link() {}
 pub fn doc_valid_link_url_invalid_char() {}
 
 /// Test valid link, text tag broken across multiple lines.
-/// [doc invalid link broken
+/// [doc valid link broken
 /// text](https://test.fake/doc_valid_link_broken_text)
 pub fn doc_valid_link_broken_text() {}
 
@@ -50,7 +50,7 @@ pub fn doc_valid_link_broken_url_tag_two_lines_second() {}
 pub fn doc_valid_link_broken_url_tag_three_lines() {}
 
 /// Test invalid link, url part broken across multiple lines.
-/// [doc invalid link broken url scheme part part](https://
+/// [doc invalid link broken url scheme part](https://
 /// test.fake/doc_invalid_link_broken_url_scheme_part)
 //~^^ ERROR: possible broken doc link: broken across multiple lines
 pub fn doc_invalid_link_broken_url_scheme_part() {}
