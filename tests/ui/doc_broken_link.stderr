@@ -8,26 +8,10 @@ LL | /// [doc invalid link broken url scheme part](https://
    = help: to override `-D warnings` add `#[allow(clippy::doc_broken_link)]`
 
 error: possible broken doc link: broken across multiple lines
-  --> tests/ui/doc_broken_link.rs:53:5
-   |
-LL | /// [doc invalid link broken url scheme part part](https://
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = note: duplicate diagnostic emitted due to `-Z deduplicate-diagnostics=no`
-
-error: possible broken doc link: broken across multiple lines
   --> tests/ui/doc_broken_link.rs:59:5
    |
 LL | /// [doc invalid link broken url host part](https://test
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-error: possible broken doc link: broken across multiple lines
-  --> tests/ui/doc_broken_link.rs:59:5
-   |
-LL | /// [doc invalid link broken url host part](https://test
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = note: duplicate diagnostic emitted due to `-Z deduplicate-diagnostics=no`
 
 error: possible broken doc link: broken across multiple lines
   --> tests/ui/doc_broken_link.rs:65:16
@@ -41,21 +25,5 @@ error: possible broken doc link: broken across multiple lines
 LL | /// with a [second link - valid](https://test.fake/doc_valid_link) and another [third link - invalid](https://test
    |                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: possible broken doc link: broken across multiple lines
-  --> tests/ui/doc_broken_link.rs:65:16
-   |
-LL | /// There is a [fist link - invalid](https://test
-   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = note: duplicate diagnostic emitted due to `-Z deduplicate-diagnostics=no`
-
-error: possible broken doc link: broken across multiple lines
-  --> tests/ui/doc_broken_link.rs:68:80
-   |
-LL | /// with a [second link - valid](https://test.fake/doc_valid_link) and another [third link - invalid](https://test
-   |                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = note: duplicate diagnostic emitted due to `-Z deduplicate-diagnostics=no`
-
-error: aborting due to 8 previous errors
+error: aborting due to 4 previous errors
 
