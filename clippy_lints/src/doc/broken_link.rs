@@ -9,18 +9,13 @@ use super::DOC_BROKEN_LINK;
 /// Scan and report broken link on documents.
 /// It ignores false positives detected by pulldown_cmark, and only
 /// warns users when the broken link is consider a URL.
-pub fn check(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &String, fragments: &Vec<DocFragment>) {
-    warn_if_broken_link(cx, bl, doc, fragments);
-}
-
-/// The reason why a link is considered broken.
 // NOTE: We don't check these other cases because
 // rustdoc itself will check and warn about it:
 // - When a link url is broken across multiple lines in the URL path part
 // - When a link tag is missing the close parenthesis character at the end.
 // - When a link has whitespace within the url link.
-enum BrokenLinkReason {
-    MultipleLines,
+pub fn check(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &String, fragments: &Vec<DocFragment>) {
+    warn_if_broken_link(cx, bl, doc, fragments);
 }
 
 fn warn_if_broken_link(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &String, fragments: &Vec<DocFragment>) {
@@ -64,7 +59,7 @@ fn warn_if_broken_link(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &
             }
 
             if c == '\n' {
-                report_broken_link(cx, span, len, BrokenLinkReason::MultipleLines);
+                report_broken_link(cx, span, len);
                 break;
             }
 
@@ -73,20 +68,16 @@ fn warn_if_broken_link(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &
     }
 }
 
-fn report_broken_link(cx: &LateContext<'_>, frag_span: Span, offset: usize, reason: BrokenLinkReason) {
+fn report_broken_link(cx: &LateContext<'_>, frag_span: Span, offset: usize) {
     let start = frag_span.lo();
     let end = start + BytePos::from_usize(offset);
 
     let span = Span::new(start, end, frag_span.ctxt(), frag_span.parent());
 
-    let reason_msg = match reason {
-        BrokenLinkReason::MultipleLines => "broken across multiple lines",
-    };
-
     span_lint(
         cx,
         DOC_BROKEN_LINK,
         span,
-        format!("possible broken doc link: {reason_msg}"),
+        "possible broken doc link: broken across multiple lines",
     );
 }
