@@ -51,6 +51,12 @@ fn warn_if_broken_link(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &
             },
         };
 
+        if raw_link.starts_with("(http") {
+            // reduce chances of false positive reports
+            // by limiting this checking only to http/https links.
+            return;
+        }
+
         for c in raw_link.chars() {
             if c == ')' {
                 // it is a valid link
@@ -58,10 +64,10 @@ fn warn_if_broken_link(cx: &LateContext<'_>, bl: &PullDownBrokenLink<'_>, doc: &
             }
 
             if c == '\n' {
-                // detected break line within the url part
                 report_broken_link(cx, span, len, BrokenLinkReason::MultipleLines);
                 break;
             }
+
             len += 1;
         }
     }
